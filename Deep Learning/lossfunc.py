@@ -1,3 +1,4 @@
-print('testing')
-print('testing2')
-print('testing3')
+#Use Tensorflow
+'''
+(1/n)sigma(^y - y)^2
+'''
