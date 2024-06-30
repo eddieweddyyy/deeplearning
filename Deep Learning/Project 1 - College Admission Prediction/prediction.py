@@ -30,5 +30,5 @@ model = tf.keras.models.Sequential([
 model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy']) #binary_crossentropy => range 0 - 1
 model.fit(xdata, ydata, epochs=1000) #model.fit(input, result, epochs=int)
 
-prdct = model.predict([[750], [3.70], 3], [400, 2.2, 1], [900, 4.5, 1])
+prdct = model.predict([[750, 3.70, 3], [400, 2.2, 1], [900, 4.5, 1]])
 print(prdct)
