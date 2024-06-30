@@ -2,7 +2,7 @@ import tensorflow as tf
 import pandas as pd
 import numpy as np
 
-data = pd.read_csv('/content/gpascore.csv')
+data = pd.read_csv('gpascore.csv')
 
 # print(data.isnull().sum())
 data = data.dropna()
