@@ -1,5 +1,12 @@
 import tensorflow as tf
+import matplotlib.pyplot as plt
+
 (trainX, trainY), (testX, testY) = tf.keras.datasets.fashion_mnist.load_data()
+
+plt.imshow(trainX[1])
+plt.gray()
+plt.colorbar()
+plt.show()
 
 class_names = ['T-shirt/top', 'Trouser', 'Pullover', 'Dress', 'Coat', 'Sandal', 'Shirt', 'Sneaker', 'Bag', 'Ankle boot']
 
@@ -17,9 +24,4 @@ model.summary()
 
 model.compile(loss="sparse_categorical_crossentropy", optimizer="adam", metrics=['accuracy'])
 model.fit(trainX, trainY, epochs=5)
-
-
-
-
-
 
