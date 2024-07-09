@@ -1,25 +1,26 @@
-# Need kaggle.json & dogs-vscats-redux-kernels-edition/test and train unzipped.
+# Need kaggle.json to download: 
+# dogs-vscats-redux-kernels-edition/test and train unzipped.
 import os
 
-os.mkdir('/content/dataset')
-os.mkdir('/content/dataset/cats')
-os.mkdir('/content/dataset/dogs')
+os.mkdir('dataset')
+os.mkdir('dataset/cats')
+os.mkdir('dataset/dogs')
 
 import tensorflow as tf
 import shutil
 
-print(len(os.listdir('/content/train/')))
+print(len(os.listdir('/train/')))
 
-for i in os.listdir('/content/train/'):
+for i in os.listdir('/train/'):
   if 'cat' in i:
-    shutil.copyfile('/content/train/' + i, '/content/dataset/cats/' + i)
+    shutil.copyfile('/train/' + i, '/dataset/cats/' + i)
   else:
-    shutil.copyfile('/content/train/' + i, '/content/dataset/dogs/' + i)
+    shutil.copyfile('/train/' + i, '/dataset/dogs/' + i)
 
 # tf.keras.preprocessing.image_dataset_from_directory('')
 
 train_ds  = tf.keras.preprocessing.image_dataset_from_directory(
-    '/content/dataset',
+    '/dataset',
     image_size=(150,150),
     batch_size=64,
     subset='training',
@@ -28,7 +29,7 @@ train_ds  = tf.keras.preprocessing.image_dataset_from_directory(
 )
 
 val_ds  = tf.keras.preprocessing.image_dataset_from_directory(
-    '/content/dataset',
+    '/dataset',
     image_size=(150,150),
     batch_size=64,
     subset='validation',
@@ -72,7 +73,7 @@ model.summary()
 model.compile(loss="binary_crossentropy", optimizer="adam", metrics=['accuracy'])
 model.fit(train_ds, validation_data=val_ds, epochs=5)
 
-from tensorflow.keras.applications.inception_v3 import InceptionV3
+from tensorflow.keras.applications.inception_v3 import InceptionV3 # type: ignore
 
 inception_model = InceptionV3(input_shape=(150,150,3), include_top=False)
 inception_model.load_weights('inception_v3.h5')
