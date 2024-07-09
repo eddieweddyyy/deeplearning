@@ -20,8 +20,8 @@ for i in os.listdir('/content/train/'):
 
 train_ds  = tf.keras.preprocessing.image_dataset_from_directory(
     '/content/dataset',
-    image_size=(64,64),
-    batch_size=32,
+    image_size=(150,150),
+    batch_size=64,
     subset='training',
     validation_split=0.2,
     seed=1234
@@ -29,8 +29,8 @@ train_ds  = tf.keras.preprocessing.image_dataset_from_directory(
 
 val_ds  = tf.keras.preprocessing.image_dataset_from_directory(
     '/content/dataset',
-    image_size=(64,64),
-    batch_size=32,
+    image_size=(150,150),
+    batch_size=64,
     subset='validation',
     validation_split=0.2,
     seed=1234
@@ -71,3 +71,37 @@ model.summary()
 
 model.compile(loss="binary_crossentropy", optimizer="adam", metrics=['accuracy'])
 model.fit(train_ds, validation_data=val_ds, epochs=5)
+
+from tensorflow.keras.applications.inception_v3 import InceptionV3
+
+inception_model = InceptionV3(input_shape=(150,150,3), include_top=False)
+inception_model.load_weights('inception_v3.h5')
+
+# inception_model.summary()
+
+for i in inception_model.layers:
+  i.trainable = False
+
+unfreeze = False
+for i in inception_model.layers:
+  if i.name == 'mixed6':
+    unfreeze = True
+  if unfreeze == True:
+    i.trainable = True
+
+last_layer = inception_model.get_layer('mixed7')
+
+# print(last_layer)
+# print(last_layer.output)
+# print(last_layer.output_shape)
+
+layer1 = tf.keras.layers.Flatten()(last_layer.output)
+layer2 = tf.keras.layers.Dense(1024, activation='relu')(layer1)
+drop1 = tf.keras.layers.Dropout(0.2)(layer2)
+output = tf.keras.layers.Dense(1, activation='sigmoid')(drop1)
+
+model = tf.keras.Model(inception_model.input, output)
+# model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['acc'])
+model.compile(loss='binary_crossentropy', optimizer=tf.keras.optimizers.Adam(lr=0.00001), metrics=['acc'])
+
+model.fit(train_ds, validation_data=val_ds, epochs=2)
