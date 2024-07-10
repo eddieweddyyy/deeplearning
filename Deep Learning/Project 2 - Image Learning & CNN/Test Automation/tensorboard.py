@@ -26,14 +26,6 @@ tensorboard = tf.keras.callbacks.TensorBoard(log_dir='logs/{}'.format('firstmode
 model.fit(trainX, trainY, validation_data=(testX, testY), epochs=3, callbacks=[tensorboard])
 
 #------------------------------------------------------------------------------------------------------------------
-(trainX, trainY), (testX, testY) = tf.keras.datasets.fashion_mnist.load_data()
-
-trainX = trainX / 255.0
-testX = testX / 255.0
-
-trainX = trainX.reshape( (trainX.shape[0], 28,28,1) )
-testX = testX.reshape( (testX.shape[0], 28,28,1) )
-
 model = tf.keras.Sequential([
     tf.keras.layers.Conv2D(32,(3,3), padding="same", activation="relu", input_shape=(28,28,1)),
     tf.keras.layers.MaxPooling2D((2,2)),
