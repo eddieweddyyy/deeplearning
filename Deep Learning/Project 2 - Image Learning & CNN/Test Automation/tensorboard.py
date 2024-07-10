@@ -42,6 +42,22 @@ model = tf.keras.Sequential([
     tf.keras.layers.Dense(10, activation='softmax'),
 ])
 
+
+#Save and Checkpoints----------------------------------------
+callback = tf.keras.callbacks.ModelCheckpoint(
+    filepath='checkpoint/mnist',
+    # monitor='val_acc',
+    # mode='max',
+    # filepath='checkpoint/mnist{epoch}',
+    save_weights_only=True,
+    save_freq='epoch'
+)
+model.save('new/model1')
+loaded_model = tf.keras.models.load_model('new/model1')
+
+loaded_model.summary()
+loaded_model.evaluate(testX, testY)
+# -----------------------------------------------------------
 model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['acc'])
 
 tensorboard = tf.keras.callbacks.TensorBoard(log_dir='logs/{}'.format('Conv2model' + str(int(time.time()))))
