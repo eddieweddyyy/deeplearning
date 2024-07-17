@@ -54,4 +54,4 @@ model = tf.keras.models.Sequential([
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 model.fit(trainX, trainY, batch_size=64, epochs=1000, verbose=2)
 
-model.save('/composer AI/model1')
+model.save(r'C:\Users\CKIRUser\Desktop\eddie\coding_eddie2\Deep Learning\Project 3,4 - Sequence Learning & RNN\Composer AI\model1')
