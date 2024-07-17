@@ -53,7 +53,7 @@ for i, answer in train_ds.take(1):
   print(answer)
 #   plt.imshow(i[0].numpy().astype('uint8'))
 #   plt.show()
-
+# --------------------------------------
 model = tf.keras.Sequential([
     tf.keras.layers.Conv2D(32, (3, 3), padding="same", activation='relu', input_shape=(64, 64, 3)),
     tf.keras.layers.MaxPooling2D(2, 2),
