@@ -6,10 +6,11 @@ import re
 import itertools
 from sklearn.model_selection import train_test_split
 
+
+
 tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
-
 bert_model = TFAutoModel.from_pretrained("bert-base-uncased", output_hidden_states=True, from_pt=True)
-
+bert_model.trainable = True
 raw = pd.read_csv('/Users/edwardjang/Desktop/deeplearning/labeled_data.csv')
 raw.drop_duplicates(subset=['tweet'], inplace=True)
 raw['tweet'] = raw['tweet'].apply(lambda x: ''.join(ch for ch, _ in itertools.groupby(x)))
@@ -58,12 +59,15 @@ print(encoded_tweets)
 input_ids = encoded_tweets['input_ids'].numpy()
 attention_masks = encoded_tweets['attention_mask'].numpy()
 
+
 X_train, X_val, y_train, y_val = train_test_split(
     input_ids,
     raw['class'].values,
     test_size=0.2,
     random_state=42
 )
+
+
 train_masks, val_masks = train_test_split(
     attention_masks,
     test_size=0.2,
@@ -80,7 +84,10 @@ def get_bert_embeddings(inputs):
 
 emb_output = tf.keras.layers.Lambda(get_bert_embeddings, output_shape=(200, 768))([input_ids_layer, attention_mask_layer])
 
-x = tf.keras.layers.LSTM(64, return_sequences=False)(emb_output)
+x = tf.keras.layers.LSTM(128, return_sequences=True)(emb_output)
+x = tf.keras.layers.LSTM(64, return_sequences=False)(x)
+x = tf.keras.layers.Dense(128, activation='relu')(x)
+x = tf.keras.layers.Dropout(0.4)(x)
 x = tf.keras.layers.Dense(64, activation='relu')(x)
 x = tf.keras.layers.Dropout(0.3)(x)
 
@@ -94,14 +101,22 @@ classifier_model.compile(
     metrics=['accuracy']
 )
 
+reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=2, min_lr=1e-7)
+early_stop = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=3, restore_best_weights=True)
+
 history = classifier_model.fit(
     [X_train, train_masks],
     y_train,
     validation_data=([X_val, val_masks], y_val),
-    epochs=3,
-    batch_size=16
+    epochs=5,
+    batch_size=64,
+    callbacks=[reduce_lr, early_stop]
 )
+print("saving")
+classifier_model.save('/Users/edwardjang/Desktop/deeplearning/commentmodel.h5')
+print("saved")
 
 loss, accuracy = classifier_model.evaluate([X_val, val_masks], y_val)
 print(f"Validation Accuracy: {accuracy}")
 print(raw['tweet'])
+
