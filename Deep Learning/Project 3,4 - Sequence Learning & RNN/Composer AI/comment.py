@@ -7,7 +7,7 @@ import itertools
 from sklearn.model_selection import train_test_split
 
 tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
-# Keep BERT model with a clear name
+
 bert_model = TFAutoModel.from_pretrained("bert-base-uncased", output_hidden_states=True, from_pt=True)
 
 raw = pd.read_csv('/Users/edwardjang/Desktop/deeplearning/labeled_data.csv')
@@ -51,33 +51,28 @@ def encode_tweets(data, max_len=200):
     )
     return encoded
 
-# Tokenize the tweets
+
 encoded_tweets = encode_tweets(raw['tweet'].tolist(), max_len=200)
 print(encoded_tweets)
 
 input_ids = encoded_tweets['input_ids'].numpy()
 attention_masks = encoded_tweets['attention_mask'].numpy()
 
-# Split data into train and validation sets
 X_train, X_val, y_train, y_val = train_test_split(
     input_ids,
     raw['class'].values,
     test_size=0.2,
     random_state=42
 )
-
-# Split attention masks the same way
 train_masks, val_masks = train_test_split(
     attention_masks,
     test_size=0.2,
     random_state=42
 )
 
-# Build the model
 input_ids_layer = tf.keras.Input(shape=(200,), dtype=tf.int32, name="input_ids")
 attention_mask_layer = tf.keras.Input(shape=(200,), dtype=tf.int32, name="attention_mask")
 
-# Use bert_model instead of model
 def get_bert_embeddings(inputs):
     input_ids, attention_mask = inputs
     output = bert_model(input_ids, attention_mask=attention_mask)
@@ -91,7 +86,6 @@ x = tf.keras.layers.Dropout(0.3)(x)
 
 new_output = tf.keras.layers.Dense(3, activation='softmax')(x)
 
-# Create classifier model (different name!)
 classifier_model = tf.keras.Model(inputs=[input_ids_layer, attention_mask_layer], outputs=new_output)
 
 classifier_model.compile(
@@ -100,7 +94,6 @@ classifier_model.compile(
     metrics=['accuracy']
 )
 
-# Train with properly split masks
 history = classifier_model.fit(
     [X_train, train_masks],
     y_train,
