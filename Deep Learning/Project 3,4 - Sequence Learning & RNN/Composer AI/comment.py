@@ -113,7 +113,7 @@ history = classifier_model.fit(
     callbacks=[reduce_lr, early_stop]
 )
 print("saving")
-classifier_model.save('/Users/edwardjang/Desktop/deeplearning/commentmodel.h5')
+classifier_model.save('/Users/edwardjang/Desktop/deeplearning/commentmodel.keras')
 print("saved")
 
 loss, accuracy = classifier_model.evaluate([X_val, val_masks], y_val)
